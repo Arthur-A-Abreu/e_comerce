@@ -1,0 +1,456 @@
+{% extends 'produtos/base.html' %}
+
+{% block title %}
+    {% if busca_ativa %}
+        Resultados para "{{ termo_pesquisa }}" | ArthurLivre
+    {% else %}
+        ArthurLivre - Promoções, Eletrônicos, Moda e mais
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Banner styling */
+    .hero-banner {
+        background: linear-gradient(135deg, var(--dark-navy) 0%, var(--light-navy) 100%);
+        border-radius: 12px;
+        padding: 40px;
+        color: var(--white);
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(0, 119, 182, 0.15);
+        border-radius: 50%;
+        top: -100px;
+        right: -50px;
+        z-index: 1;
+    }
+
+    .hero-content {
+        max-width: 55%;
+        z-index: 2;
+    }
+
+    .hero-tag {
+        background-color: var(--ocean-blue);
+        color: var(--white);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+
+    .hero-title {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+        opacity: 0.85;
+        margin-bottom: 24px;
+    }
+
+    .hero-btn {
+        background-color: var(--white);
+        color: var(--dark-navy);
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 700;
+        display: inline-block;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+    .hero-btn:hover {
+        background-color: var(--dark-navy);
+        color: var(--white);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .hero-image {
+        max-width: 40%;
+        max-height: 250px;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-image i {
+        font-size: 120px;
+        color: rgba(255, 255, 255, 0.85);
+        filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+        animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* Sections styling */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-left: 5px solid var(--dark-navy);
+        padding-left: 12px;
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--dark-navy);
+    }
+
+    .section-link {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ocean-blue);
+    }
+
+    .section-link:hover {
+        text-decoration: underline;
+    }
+
+    .product-section {
+        margin-bottom: 50px;
+    }
+
+    /* Product Grid and Cards styling */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .product-card {
+        background-color: var(--white);
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: var(--transition);
+    }
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(11, 19, 43, 0.15);
+    }
+
+    .product-image-container {
+        height: 220px;
+        padding: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--white);
+        border-bottom: 1px solid #f0f0f0;
+        position: relative;
+    }
+
+    .product-img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        transition: var(--transition);
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.03);
+    }
+
+    .product-info {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .product-title {
+        font-size: 14px;
+        color: var(--text-dark);
+        font-weight: 400;
+        margin-bottom: 10px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 38px;
+    }
+
+    .product-prices {
+        margin-top: auto;
+    }
+
+    .price-original {
+        font-size: 12px;
+        text-decoration: line-through;
+        color: var(--text-light);
+        height: 18px;
+        margin-bottom: 2px;
+    }
+
+    .price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .price-current {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--dark-navy);
+        letter-spacing: -0.5px;
+    }
+
+    .price-discount {
+        color: var(--green-tag);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .installment-info {
+        font-size: 12px;
+        color: var(--text-light);
+        margin-top: 4px;
+    }
+
+    .shipping-badge {
+        color: var(--green-tag);
+        font-size: 13px;
+        font-weight: 700;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background-color: var(--white);
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: var(--mid-navy);
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        margin-bottom: 24px;
+    }
+
+    /* Responsive grid */
+    @media (max-width: 992px) {
+        .products-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .hero-title {
+            font-size: 26px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .hero-banner {
+            flex-direction: column;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .hero-content {
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+        .hero-image {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    {% if busca_ativa %}
+        <!-- Search Results Header -->
+        <div class="section-header">
+            <h2 class="section-title">Resultados da busca por "{{ termo_pesquisa }}"</h2>
+            <span class="section-link">{{ produtos.count }} produto{{ produtos.count|pluralize:"s" }} encontrado{{ produtos.count|pluralize:"s" }}</span>
+        </div>
+
+        {% if produtos %}
+            <div class="products-grid">
+                {% for produto in produtos %}
+                    <a href="{% url 'produtos:detalhe_produto' produto.pk %}" class="product-card">
+                        <div class="product-image-container">
+                            {% if produto.imagem %}
+                                <img src="{{ produto.imagem.url }}" alt="{{ produto.titulo }}" class="product-img">
+                            {% else %}
+                                <img src="/static/images/placeholder.jpg" alt="Sem imagem" class="product-img">
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">{{ produto.titulo }}</h3>
+                            
+                            <div class="product-prices">
+                                {% if produto.preco_promocional %}
+                                    <div class="price-original">R$ {{ produto.preco_original }}</div>
+                                    <div class="price-row">
+                                        <span class="price-current">R$ {{ produto.preco_promocional }}</span>
+                                        <span class="price-discount">{{ produto.percentual_desconto }}% OFF</span>
+                                    </div>
+                                {% else %}
+                                    <div class="price-original"></div>
+                                    <div class="price-row">
+                                        <span class="price-current">R$ {{ produto.preco_original }}</span>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="installment-info">
+                                    em 10x sem juros
+                                </div>
+                                
+                                {% if produto.frete_gratis %}
+                                    <div class="shipping-badge">
+                                        <i class="fa-solid fa-truck"></i> Frete grátis
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <h3>Nenhum resultado encontrado</h3>
+                <p>Verifique a grafia ou tente buscar outros termos semelhantes.</p>
+                <a href="{% url 'produtos:index' %}" class="hero-btn">Voltar para a Loja</a>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Hero Promo Banner (Home Page Only) -->
+        <div class="hero-banner">
+            <div class="hero-content">
+                <span class="hero-tag">Super Ofertas</span>
+                <h1 class="hero-title">Nova Coleção de Tecnologia & Estilo</h1>
+                <p class="hero-subtitle">Parcele suas compras em até 10x sem juros e garanta frete grátis nos produtos selecionados.</p>
+                <a href="#" class="hero-btn">Ver Ofertas <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></a>
+            </div>
+            <div class="hero-image">
+                <i class="fa-solid fa-laptop-code"></i>
+            </div>
+        </div>
+
+        <!-- Sections grouped by Categoria -->
+        {% if categorias %}
+            {% for categoria in categorias %}
+                {% if categoria.produtos_ativos %}
+                    <div class="product-section">
+                        <div class="section-header">
+                            <h2 class="section-title">{{ categoria.nome }}</h2>
+                            <a href="#" class="section-link">Ver mais</a>
+                        </div>
+                        
+                        <div class="products-grid">
+                            {% for produto in categoria.produtos_ativos %}
+                                <a href="{% url 'produtos:detalhe_produto' produto.pk %}" class="product-card">
+                                    <div class="product-image-container">
+                                        {% if produto.imagem %}
+                                            <img src="{{ produto.imagem.url }}" alt="{{ produto.titulo }}" class="product-img">
+                                        {% else %}
+                                            <img src="/static/images/placeholder.jpg" alt="Sem imagem" class="product-img">
+                                        {% endif %}
+                                    </div>
+                                    <div class="product-info">
+                                        <h3 class="product-title">{{ produto.titulo }}</h3>
+                                        
+                                        <div class="product-prices">
+                                            {% if produto.preco_promocional %}
+                                                <div class="price-original">R$ {{ produto.preco_original }}</div>
+                                                <div class="price-row">
+                                                    <span class="price-current">R$ {{ produto.preco_promocional }}</span>
+                                                    <span class="price-discount">{{ produto.percentual_desconto }}% OFF</span>
+                                                </div>
+                                            {% else %}
+                                                <div class="price-original"></div>
+                                                <div class="price-row">
+                                                    <span class="price-current">R$ {{ produto.preco_original }}</span>
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div class="installment-info">
+                                                em 10x sem juros
+                                            </div>
+                                            
+                                            {% if produto.frete_gratis %}
+                                                <div class="shipping-badge">
+                                                    <i class="fa-solid fa-truck"></i> Frete grátis
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-store-slash"></i>
+                <h3>Nenhuma categoria cadastrada</h3>
+                <p>Por favor, acesse o Django Admin para cadastrar categorias e produtos ativos.</p>
+                <a href="/admin/" class="hero-btn" target="_blank">Ir para o Painel</a>
+            </div>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

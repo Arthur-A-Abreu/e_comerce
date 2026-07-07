@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Arthur Livre | O seu E-commerce{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Core Custom Properties (Navy Blue Theme) */
+        :root {
+            --dark-navy: #0b132b;
+            --light-navy: #1c2541;
+            --mid-navy: #3a506b;
+            --ocean-blue: #0077b6;
+            --white: #ffffff;
+            --black: #050811;
+            --bg-gray: #f4f6f9;
+            --text-dark: #1c2541;
+            --text-light: #6c757d;
+            --border-color: #e2e8f0;
+            
+            /* Green accents for specific ecommerce tags as required */
+            --green-tag: #00a650;
+            --green-bg: #e6f7ee;
+            
+            --font-family: 'Outfit', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(11, 19, 43, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        /* Header / Navbar */
+        header {
+            background-color: var(--dark-navy);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: var(--ocean-blue);
+        }
+
+        .search-form {
+            flex-grow: 1;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-family: var(--font-family);
+            font-size: 15px;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: var(--black);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            background-color: var(--white);
+            border-color: var(--ocean-blue);
+            box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.2);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--light-navy);
+            cursor: pointer;
+            padding: 8px 12px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .search-button:hover {
+            color: var(--ocean-blue);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.9;
+        }
+
+        .nav-link:hover {
+            opacity: 1;
+            color: var(--ocean-blue);
+        }
+
+        .header-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 8px;
+            font-size: 14px;
+        }
+
+        .categories-nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .category-item {
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        .category-item:hover {
+            opacity: 1;
+            color: var(--ocean-blue);
+        }
+
+        /* Main Content wrapper */
+        main {
+            flex-grow: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--black);
+            color: rgba(255,255,255,0.7);
+            border-top: 5px solid var(--light-navy);
+            padding: 40px 20px;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .footer-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-form {
+                max-width: 100%;
+                order: 3;
+            }
+            .header-right {
+                justify-content: space-between;
+            }
+            .header-bottom {
+                display: none;
+            }
+            .footer-container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="header-top">
+                <a href="{% url 'produtos:index' %}" class="logo">
+                    <i class="fa-solid fa-bolt"></i> Arthur<span>Livre</span>
+                </a>
+                
+                <form action="{% url 'produtos:index' %}" method="get" class="search-form">
+                    <input type="text" name="q" value="{{ termo_pesquisa|default:'' }}" placeholder="Buscar produtos, marcas e muito mais..." class="search-input">
+                    <button type="submit" class="search-button">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+                
+                <div class="header-right">
+                    <a href="#" class="nav-link"><i class="fa-solid fa-shopping-cart"></i> Carrinho</a>
+                    <a href="#" class="nav-link"><i class="fa-solid fa-circle-user"></i> Entrar</a>
+                </div>
+            </div>
+            
+            <div class="header-bottom">
+                <div class="categories-nav">
+                    <a href="{% url 'produtos:index' %}" class="category-item">Ver Tudo</a>
+                    <a href="#" class="category-item">Ofertas do Dia</a>
+                    <a href="#" class="category-item">Moda</a>
+                    <a href="#" class="category-item">Eletrônicos</a>
+                    <a href="#" class="category-item">Suporte</a>
+                </div>
+                <div>
+                    <span><i class="fa-solid fa-location-dot"></i> Enviar para Arthur - São Paulo</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div>
+                <span class="footer-logo"><i class="fa-solid fa-bolt"></i> ArthurLivre</span>
+                <p style="margin-top: 8px;">&copy; 2026 ArthurLivre. Todos os direitos reservados.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">Trabalhe conosco</a>
+                <a href="#">Termos e condições</a>
+                <a href="#">Privacidade</a>
+                <a href="#">Ajuda</a>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
