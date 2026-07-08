@@ -136,13 +136,77 @@
         margin-bottom: 50px;
     }
 
-    /* Product Grid and Cards styling */
+    /* Search Results Grid (Static columns for search) */
     .products-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;
     }
 
+    /* Carousel Wrapper (Horizontal Scroll with arrows) */
+    .carousel-wrapper {
+        position: relative;
+        width: 100%;
+        padding: 5px 0;
+    }
+
+    .products-carousel {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 20px;
+        scroll-behavior: smooth;
+        scrollbar-width: none; /* Firefox */
+        padding: 10px 5px;
+    }
+
+    .products-carousel::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Edge */
+    }
+
+    .products-carousel .product-card {
+        flex: 0 0 calc(25% - 15px); /* 4 cards per row on desktop */
+        min-width: 260px;
+    }
+
+    /* Navigation buttons */
+    .carousel-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: var(--white);
+        border: 1px solid var(--border-color);
+        color: var(--dark-navy);
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+        transition: var(--transition);
+    }
+
+    .carousel-control:hover {
+        background-color: var(--dark-navy);
+        color: var(--white);
+        border-color: var(--dark-navy);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .carousel-control.prev {
+        left: -22px;
+    }
+
+    .carousel-control.next {
+        right: -22px;
+    }
+
+    /* Product Card styling */
     .product-card {
         background-color: var(--white);
         border-radius: 8px;
@@ -278,10 +342,13 @@
         margin-bottom: 24px;
     }
 
-    /* Responsive grid */
+    /* Responsive grid & flex items */
     @media (max-width: 992px) {
         .products-grid {
             grid-template-columns: repeat(3, 1fr);
+        }
+        .products-carousel .product-card {
+            flex: 0 0 calc(33.333% - 13.33px);
         }
         .hero-title {
             font-size: 26px;
@@ -292,6 +359,9 @@
         .products-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+        }
+        .products-carousel .product-card {
+            flex: 0 0 calc(50% - 10px);
         }
         .hero-banner {
             flex-direction: column;
@@ -305,11 +375,21 @@
         .hero-image {
             max-width: 100%;
         }
+        .carousel-control {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+        }
+        .carousel-control.prev { left: -10px; }
+        .carousel-control.next { right: -10px; }
     }
 
     @media (max-width: 480px) {
         .products-grid {
             grid-template-columns: 1fr;
+        }
+        .products-carousel .product-card {
+            flex: 0 0 100%;
         }
     }
 </style>
@@ -389,7 +469,7 @@
             </div>
         </div>
 
-        <!-- Sections grouped by Categoria -->
+        <!-- Sections grouped by Categoria in horizontal carousels -->
         {% if categorias %}
             {% for categoria in categorias %}
                 {% if categoria.produtos_ativos %}
@@ -399,46 +479,57 @@
                             <a href="#" class="section-link">Ver mais</a>
                         </div>
                         
-                        <div class="products-grid">
-                            {% for produto in categoria.produtos_ativos %}
-                                <a href="{% url 'produtos:detalhe_produto' produto.pk %}" class="product-card">
-                                    <div class="product-image-container">
-                                        {% if produto.imagem %}
-                                            <img src="{{ produto.imagem.url }}" alt="{{ produto.titulo }}" class="product-img">
-                                        {% else %}
-                                            <img src="/static/images/placeholder.jpg" alt="Sem imagem" class="product-img">
-                                        {% endif %}
-                                    </div>
-                                    <div class="product-info">
-                                        <h3 class="product-title">{{ produto.titulo }}</h3>
-                                        
-                                        <div class="product-prices">
-                                            {% if produto.preco_promocional %}
-                                                <div class="price-original">R$ {{ produto.preco_original }}</div>
-                                                <div class="price-row">
-                                                    <span class="price-current">R$ {{ produto.preco_promocional }}</span>
-                                                    <span class="price-discount">{{ produto.percentual_desconto }}% OFF</span>
-                                                </div>
+                        <!-- Carousel Wrapper -->
+                        <div class="carousel-wrapper">
+                            <button class="carousel-control prev" onclick="scrollCarousel(this, -1)">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            
+                            <div class="products-carousel">
+                                {% for produto in categoria.produtos_ativos %}
+                                    <a href="{% url 'produtos:detalhe_produto' produto.pk %}" class="product-card">
+                                        <div class="product-image-container">
+                                            {% if produto.imagem %}
+                                                <img src="{{ produto.imagem.url }}" alt="{{ produto.titulo }}" class="product-img">
                                             {% else %}
-                                                <div class="price-original"></div>
-                                                <div class="price-row">
-                                                    <span class="price-current">R$ {{ produto.preco_original }}</span>
-                                                </div>
-                                            {% endif %}
-                                            
-                                            <div class="installment-info">
-                                                em 10x sem juros
-                                            </div>
-                                            
-                                            {% if produto.frete_gratis %}
-                                                <div class="shipping-badge">
-                                                    <i class="fa-solid fa-truck"></i> Frete grátis
-                                                </div>
+                                                <img src="/static/images/placeholder.jpg" alt="Sem imagem" class="product-img">
                                             {% endif %}
                                         </div>
-                                    </div>
-                                </a>
-                            {% endfor %}
+                                        <div class="product-info">
+                                            <h3 class="product-title">{{ produto.titulo }}</h3>
+                                            
+                                            <div class="product-prices">
+                                                {% if produto.preco_promocional %}
+                                                    <div class="price-original">R$ {{ produto.preco_original }}</div>
+                                                    <div class="price-row">
+                                                        <span class="price-current">R$ {{ produto.preco_promocional }}</span>
+                                                        <span class="price-discount">{{ produto.percentual_desconto }}% OFF</span>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="price-original"></div>
+                                                    <div class="price-row">
+                                                        <span class="price-current">R$ {{ produto.preco_original }}</span>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <div class="installment-info">
+                                                    em 10x sem juros
+                                                </div>
+                                                
+                                                {% if produto.frete_gratis %}
+                                                    <div class="shipping-badge">
+                                                        <i class="fa-solid fa-truck"></i> Frete grátis
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                            
+                            <button class="carousel-control next" onclick="scrollCarousel(this, 1)">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
                 {% endif %}
@@ -453,4 +544,39 @@
         {% endif %}
     {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function scrollCarousel(button, direction) {
+        const wrapper = button.closest('.carousel-wrapper');
+        const carousel = wrapper.querySelector('.products-carousel');
+        const card = carousel.querySelector('.product-card');
+        if (!card) return;
+        
+        // Obter a largura de um card incluindo o gap (20px de gap)
+        const cardWidth = card.offsetWidth + 20;
+        
+        // Rolar 2 cards por clique
+        const scrollAmount = cardWidth * 2;
+        
+        let newScrollLeft = carousel.scrollLeft + (direction * scrollAmount);
+        
+        // Lógica de loop infinito visual
+        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        
+        if (direction === 1 && carousel.scrollLeft >= maxScroll - 10) {
+            // Se chegou ao fim do scroll e clicou em avançar, volta para o início
+            newScrollLeft = 0;
+        } else if (direction === -1 && carousel.scrollLeft <= 10) {
+            // Se está no início e clicou em retroceder, vai para o fim do scroll
+            newScrollLeft = maxScroll;
+        }
+        
+        carousel.scrollTo({
+            left: newScrollLeft,
+            behavior: 'smooth'
+        });
+    }
+</script>
 {% endblock %}

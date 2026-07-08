@@ -52,3 +52,22 @@ class Produto(models.Model):
             desconto = ((self.preco_original - self.preco_promocional) / self.preco_original) * 100
             return int(round(desconto))
         return 0
+
+
+class ImagemProduto(models.Model):
+    produto = models.ForeignKey(
+        Produto, 
+        on_delete=models.CASCADE, 
+        related_name='imagens', 
+        verbose_name='Produto'
+    )
+    imagem = models.ImageField('Imagem', upload_to='produtos/galeria/')
+    ordem = models.PositiveIntegerField('Ordem', default=0)
+
+    class Meta:
+        verbose_name = 'Imagem do Produto'
+        verbose_name_plural = 'Imagens do Produto'
+        ordering = ['ordem']
+
+    def __str__(self):
+        return f"Imagem de {self.produto.titulo} ({self.ordem})"

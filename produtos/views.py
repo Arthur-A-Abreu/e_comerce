@@ -12,7 +12,7 @@ def index(request):
         produtos = Produto.objects.filter(
             Q(titulo__icontains=termo_pesquisa) | Q(descricao__icontains=termo_pesquisa),
             ativo=True
-        ).select_related('categoria')
+        ).select_related('categoria').prefetch_related('imagens')
         categorias = None
     else:
         # Se não houver busca, agrupamos por categoria, otimizando as queries (evita N+1)
@@ -20,7 +20,7 @@ def index(request):
         categorias = Categoria.objects.prefetch_related(
             Prefetch(
                 'produtos',
-                queryset=Produto.objects.filter(ativo=True),
+                queryset=Produto.objects.filter(ativo=True).prefetch_related('imagens'),
                 to_attr='produtos_ativos'
             )
         )
@@ -36,7 +36,7 @@ def index(request):
 
 def detalhe_produto(request, pk):
     # Garante que apenas produtos ativos sejam exibidos
-    produto = get_object_or_404(Produto, pk=pk, ativo=True)
+    produto = get_object_or_404(Produto.objects.prefetch_related('imagens'), pk=pk, ativo=True)
     
     # Busca produtos recomendados da mesma categoria (limite de 4, excluindo o atual)
     produtos_relacionados = Produto.objects.filter(

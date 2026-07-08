@@ -42,7 +42,13 @@
         margin-bottom: 40px;
     }
 
-    /* Left Column: Image */
+    /* Left Column: Gallery styling */
+    .detail-gallery-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
     .detail-image-panel {
         display: flex;
         justify-content: center;
@@ -56,6 +62,52 @@
     }
 
     .detail-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .thumbnail-row {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        scrollbar-width: thin;
+    }
+
+    .thumbnail-row::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .thumbnail-row::-webkit-scrollbar-thumb {
+        background-color: var(--mid-navy);
+        border-radius: 3px;
+    }
+
+    .thumbnail-item {
+        width: 70px;
+        height: 70px;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        padding: 4px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--white);
+        transition: var(--transition);
+        flex-shrink: 0;
+    }
+
+    .thumbnail-item:hover {
+        border-color: var(--mid-navy);
+    }
+
+    .thumbnail-item.active {
+        border-color: var(--ocean-blue);
+    }
+
+    .thumbnail-item img {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
@@ -227,7 +279,7 @@
         line-height: 1.8;
     }
 
-    /* Related Products styling */
+    /* Carousel / Related Products styling */
     .related-title {
         font-size: 20px;
         font-weight: 700;
@@ -237,10 +289,66 @@
         padding-left: 12px;
     }
 
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
+    .carousel-wrapper {
+        position: relative;
+        width: 100%;
+        padding: 5px 0;
+    }
+
+    .products-carousel {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
         gap: 20px;
+        scroll-behavior: smooth;
+        scrollbar-width: none; /* Firefox */
+        padding: 10px 5px;
+    }
+
+    .products-carousel::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Edge */
+    }
+
+    .products-carousel .product-card {
+        flex: 0 0 calc(25% - 15px); /* 4 cards per row on desktop */
+        min-width: 250px;
+    }
+
+    /* Navigation buttons */
+    .carousel-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: var(--white);
+        border: 1px solid var(--border-color);
+        color: var(--dark-navy);
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+        transition: var(--transition);
+    }
+
+    .carousel-control:hover {
+        background-color: var(--dark-navy);
+        color: var(--white);
+        border-color: var(--dark-navy);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .carousel-control.prev {
+        left: -22px;
+    }
+
+    .carousel-control.next {
+        right: -22px;
     }
 
     .product-card {
@@ -336,23 +444,30 @@
         .product-detail-container {
             grid-template-columns: 1fr;
         }
-        .products-grid {
-            grid-template-columns: repeat(3, 1fr);
+        .products-carousel .product-card {
+            flex: 0 0 calc(33.333% - 13.33px);
         }
     }
 
     @media (max-width: 768px) {
-        .products-grid {
-            grid-template-columns: repeat(2, 1fr);
+        .products-carousel .product-card {
+            flex: 0 0 calc(50% - 10px);
         }
         .description-container, .product-detail-container {
             padding: 20px;
         }
+        .carousel-control {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+        }
+        .carousel-control.prev { left: -10px; }
+        .carousel-control.next { right: -10px; }
     }
 
     @media (max-width: 480px) {
-        .products-grid {
-            grid-template-columns: 1fr;
+        .products-carousel .product-card {
+            flex: 0 0 100%;
         }
     }
 </style>
@@ -371,12 +486,29 @@
 
     <!-- Product Main Detail Box -->
     <div class="product-detail-container">
-        <!-- Image Panel -->
-        <div class="detail-image-panel">
-            {% if produto.imagem %}
-                <img src="{{ produto.imagem.url }}" alt="{{ produto.titulo }}" class="detail-img">
-            {% else %}
-                <img src="/static/images/placeholder.jpg" alt="Sem imagem" class="detail-img">
+        <!-- Left Panel: Gallery -->
+        <div class="detail-gallery-container">
+            <div class="detail-image-panel">
+                {% if produto.imagem %}
+                    <img id="main-product-img" src="{{ produto.imagem.url }}" alt="{{ produto.titulo }}" class="detail-img">
+                {% else %}
+                    <img id="main-product-img" src="/static/images/placeholder.jpg" alt="Sem imagem" class="detail-img">
+                {% endif %}
+            </div>
+            
+            {% if produto.imagens.all %}
+                <!-- Thumbnail Row -->
+                <div class="thumbnail-row">
+                    <!-- Main image as first thumbnail -->
+                    <div class="thumbnail-item active" onclick="changeImage(this, '{{ produto.imagem.url }}')">
+                        <img src="{{ produto.imagem.url }}" alt="Foto Principal">
+                    </div>
+                    {% for img_obj in produto.imagens.all %}
+                        <div class="thumbnail-item" onclick="changeImage(this, '{{ img_obj.imagem.url }}')">
+                            <img src="{{ img_obj.imagem.url }}" alt="Foto {{ forloop.counter|add:1 }}">
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
         </div>
 
@@ -428,49 +560,105 @@
         <p class="description-text">{{ produto.descricao }}</p>
     </div>
 
-    <!-- Related Products -->
+    <!-- Related Products with Carousel -->
     {% if produtos_relacionados %}
         <div class="related-section" style="margin-bottom: 50px;">
             <h2 class="related-title">Quem viu este produto também comprou</h2>
             
-            <div class="products-grid">
-                {% for prod in produtos_relacionados %}
-                    <a href="{% url 'produtos:detalhe_produto' prod.pk %}" class="product-card">
-                        <div class="product-image-container">
-                            {% if prod.imagem %}
-                                <img src="{{ prod.imagem.url }}" alt="{{ prod.titulo }}" class="product-img">
-                            {% else %}
-                                <img src="/static/images/placeholder.jpg" alt="Sem imagem" class="product-img">
-                            {% endif %}
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-title">{{ prod.titulo }}</h3>
-                            
-                            <div class="product-prices">
-                                {% if prod.preco_promocional %}
-                                    <div class="price-original">R$ {{ prod.preco_original }}</div>
-                                    <div class="price-row">
-                                        <span class="price-current">R$ {{ prod.preco_promocional }}</span>
-                                        <span class="price-discount">{{ prod.percentual_desconto }}% OFF</span>
-                                    </div>
+            <div class="carousel-wrapper">
+                <button class="carousel-control prev" onclick="scrollCarousel(this, -1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                
+                <div class="products-carousel">
+                    {% for prod in produtos_relacionados %}
+                        <a href="{% url 'produtos:detalhe_produto' prod.pk %}" class="product-card">
+                            <div class="product-image-container">
+                                {% if prod.imagem %}
+                                    <img src="{{ prod.imagem.url }}" alt="{{ prod.titulo }}" class="product-img">
                                 {% else %}
-                                    <div class="price-original"></div>
-                                    <div class="price-row">
-                                        <span class="price-current">R$ {{ prod.preco_original }}</span>
-                                    </div>
-                                {% endif %}
-                                
-                                {% if prod.frete_gratis %}
-                                    <div class="shipping-badge">
-                                        <i class="fa-solid fa-truck"></i> Frete grátis
-                                    </div>
+                                    <img src="/static/images/placeholder.jpg" alt="Sem imagem" class="product-img">
                                 {% endif %}
                             </div>
-                        </div>
-                    </a>
-                {% endfor %}
+                            <div class="product-info">
+                                <h3 class="product-title">{{ prod.titulo }}</h3>
+                                
+                                <div class="product-prices">
+                                    {% if prod.preco_promocional %}
+                                        <div class="price-original">R$ {{ prod.preco_original }}</div>
+                                        <div class="price-row">
+                                            <span class="price-current">R$ {{ prod.preco_promocional }}</span>
+                                            <span class="price-discount">{{ prod.percentual_desconto }}% OFF</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="price-original"></div>
+                                        <div class="price-row">
+                                            <span class="price-current">R$ {{ prod.preco_original }}</span>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if prod.frete_gratis %}
+                                        <div class="shipping-badge">
+                                            <i class="fa-solid fa-truck"></i> Frete grátis
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+                
+                <button class="carousel-control next" onclick="scrollCarousel(this, 1)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // JS for Image Gallery
+    function changeImage(thumbnail, imageUrl) {
+        document.getElementById('main-product-img').src = imageUrl;
+        
+        // Remove class active from all thumbnails
+        const thumbnails = thumbnail.parentElement.querySelectorAll('.thumbnail-item');
+        thumbnails.forEach(item => item.classList.remove('active'));
+        
+        // Add class active to current thumbnail
+        thumbnail.classList.add('active');
+    }
+
+    // JS for Related Products Carousel
+    function scrollCarousel(button, direction) {
+        const wrapper = button.closest('.carousel-wrapper');
+        const carousel = wrapper.querySelector('.products-carousel');
+        const card = carousel.querySelector('.product-card');
+        if (!card) return;
+        
+        // Card width + gap (20px)
+        const cardWidth = card.offsetWidth + 20;
+        
+        // Scroll 2 cards
+        const scrollAmount = cardWidth * 2;
+        
+        let newScrollLeft = carousel.scrollLeft + (direction * scrollAmount);
+        
+        // Infinite wrap logic
+        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        
+        if (direction === 1 && carousel.scrollLeft >= maxScroll - 10) {
+            newScrollLeft = 0;
+        } else if (direction === -1 && carousel.scrollLeft <= 10) {
+            newScrollLeft = maxScroll;
+        }
+        
+        carousel.scrollTo({
+            left: newScrollLeft,
+            behavior: 'smooth'
+        });
+    }
+</script>
 {% endblock %}

@@ -2,7 +2,13 @@
 from django.contrib import admin
 # pyrefly: ignore [missing-import]
 from django.utils.safestring import mark_safe
-from .models import Categoria, Produto
+from .models import Categoria, Produto, ImagemProduto
+
+
+class ImagemProdutoInline(admin.TabularInline):
+    model = ImagemProduto
+    extra = 1
+    fields = ('imagem', 'ordem')
 
 
 @admin.register(Categoria)
@@ -14,6 +20,7 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
+    inlines = [ImagemProdutoInline]
     list_display = (
         'exibir_imagem',
         'titulo', 
