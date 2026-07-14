@@ -1,0 +1,30 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block page_title %}Erro de Autenticação{% endblock %}
+
+{% block auth_content %}
+    <div style="text-align:center;padding:10px 0;">
+        <div style="width:72px;height:72px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:30px;color:#c53030;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 style="font-size:20px;font-weight:700;color:var(--dark-navy);margin-bottom:10px;">Erro na autenticação social</h2>
+        <p style="color:var(--text-light);font-size:14px;line-height:1.6;margin-bottom:28px;">
+            Ocorreu um problema ao tentar autenticar com sua conta social.<br>
+            Por favor, tente novamente ou utilize outra forma de acesso.
+        </p>
+        {% if exception %}
+            <div style="background:#fff5f5;border:1px solid #fc8181;border-radius:8px;padding:14px;margin-bottom:24px;font-size:13px;color:#c53030;text-align:left;">
+                <strong>Detalhes do erro:</strong> {{ exception }}
+            </div>
+        {% endif %}
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a href="{% url 'account_login' %}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:linear-gradient(135deg,var(--ocean-blue),var(--mid-navy));color:var(--white);border-radius:8px;font-weight:700;font-family:var(--font-family);font-size:14px;text-decoration:none;">
+                <i class="fa-solid fa-right-to-bracket"></i> Tentar Novamente
+            </a>
+            <a href="{% url 'produtos:index' %}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--white);border:2px solid var(--border-color);border-radius:8px;font-weight:600;font-family:var(--font-family);font-size:14px;color:var(--text-dark);text-decoration:none;">
+                <i class="fa-solid fa-house"></i> Ir para a Loja
+            </a>
+        </div>
+    </div>
+{% endblock %}

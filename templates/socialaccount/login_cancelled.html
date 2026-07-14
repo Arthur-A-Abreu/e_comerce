@@ -1,0 +1,24 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block page_title %}Login Cancelado{% endblock %}
+
+{% block auth_content %}
+    <div style="text-align:center;padding:10px 0;">
+        <div style="width:72px;height:72px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:30px;color:#c53030;">
+            <i class="fa-solid fa-xmark-circle"></i>
+        </div>
+        <h2 style="font-size:20px;font-weight:700;color:var(--dark-navy);margin-bottom:10px;">Login cancelado</h2>
+        <p style="color:var(--text-light);font-size:14px;margin-bottom:28px;">
+            Você cancelou o processo de login social. Tente novamente ou utilize outro método.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a href="{% url 'account_login' %}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:linear-gradient(135deg,var(--ocean-blue),var(--mid-navy));color:var(--white);border-radius:8px;font-weight:700;font-family:var(--font-family);font-size:14px;text-decoration:none;">
+                <i class="fa-solid fa-right-to-bracket"></i> Tentar Novamente
+            </a>
+            <a href="{% url 'produtos:index' %}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--white);border:2px solid var(--border-color);border-radius:8px;font-weight:600;font-family:var(--font-family);font-size:14px;color:var(--text-dark);text-decoration:none;">
+                <i class="fa-solid fa-house"></i> Ir para a Loja
+            </a>
+        </div>
+    </div>
+{% endblock %}

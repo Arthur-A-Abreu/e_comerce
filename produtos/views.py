@@ -2,6 +2,8 @@
 from django.shortcuts import render, get_object_or_404
 # pyrefly: ignore [missing-import]
 from django.db.models import Prefetch, Q
+# pyrefly: ignore [missing-import]
+from django.contrib.auth.decorators import login_required
 from .models import Categoria, Produto
 
 def index(request):
@@ -50,3 +52,7 @@ def detalhe_produto(request, pk):
     }
     return render(request, 'produtos/detalhe.html', context)
 
+
+@login_required
+def perfil(request):
+    return render(request, 'account/profile.html')

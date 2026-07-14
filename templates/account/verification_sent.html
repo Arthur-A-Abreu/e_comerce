@@ -1,0 +1,31 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block page_title %}Verificação Enviada{% endblock %}
+
+{% block auth_content %}
+    <div style="text-align:center;padding:10px 0;">
+        <div style="width:80px;height:80px;background:rgba(0,119,182,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:36px;color:var(--ocean-blue);animation:pulse 2s ease-in-out infinite;">
+            <i class="fa-solid fa-paper-plane"></i>
+        </div>
+        <h2 style="font-size:20px;font-weight:700;color:var(--dark-navy);margin-bottom:10px;">Email de verificação enviado!</h2>
+        <p style="color:var(--text-light);font-size:14px;line-height:1.6;margin-bottom:28px;">
+            Enviamos um email de confirmação para o endereço cadastrado.<br>
+            Verifique sua caixa de entrada e clique no link para ativar sua conta.
+        </p>
+        <div style="background:var(--bg-gray);border-radius:10px;padding:16px;margin-bottom:24px;font-size:13px;color:var(--text-light);">
+            <i class="fa-solid fa-circle-info" style="color:var(--ocean-blue);margin-right:6px;"></i>
+            Não recebeu o email? Verifique a pasta de <strong>spam</strong> ou lixo eletrônico.
+        </div>
+        <a href="{% url 'produtos:index' %}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,var(--ocean-blue),var(--mid-navy));color:var(--white);border-radius:8px;font-weight:700;font-family:var(--font-family);font-size:15px;text-decoration:none;">
+            <i class="fa-solid fa-house"></i> Ir para a Loja
+        </a>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+    </style>
+{% endblock %}

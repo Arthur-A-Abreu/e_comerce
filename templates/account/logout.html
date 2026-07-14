@@ -1,0 +1,27 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n allauth %}
+
+{% block page_title %}Sair da conta{% endblock %}
+
+{% block auth_content %}
+    <div style="text-align:center; padding: 10px 0;">
+        <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--dark-navy),var(--light-navy));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:30px;color:var(--white);">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </div>
+        <h2 style="font-size:20px;font-weight:700;color:var(--dark-navy);margin-bottom:10px;">Tem certeza que deseja sair?</h2>
+        <p style="color:var(--text-light);font-size:14px;margin-bottom:28px;">Você precisará fazer login novamente para acessar sua conta.</p>
+
+        <form method="post" action="{% url 'account_logout' %}" id="logout-form">
+            {% csrf_token %}
+            {{ redirect_field }}
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                <a href="{% url 'produtos:index' %}" style="padding:12px 28px;background:var(--white);border:2px solid var(--border-color);border-radius:8px;font-family:var(--font-family);font-size:15px;font-weight:600;color:var(--text-dark);cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+                    <i class="fa-solid fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" style="padding:12px 28px;background:linear-gradient(135deg,var(--ocean-blue),var(--mid-navy));color:var(--white);font-family:var(--font-family);font-size:15px;font-weight:700;border:none;border-radius:8px;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Confirmar Saída
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

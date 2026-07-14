@@ -1,0 +1,51 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n allauth %}
+
+{% block page_title %}Entrar na sua conta{% endblock %}
+
+{% block auth_content %}
+    {% if not SOCIALACCOUNT_ONLY %}
+        <p class="auth-link-text">
+            Ainda não tem conta?
+            <a href="{{ signup_url }}">Criar conta grátis</a>
+        </p>
+
+        <form method="post" action="{% url 'account_login' %}" class="auth-form" id="login-form">
+            {% csrf_token %}
+            {{ redirect_field }}
+
+            {% for field in form %}
+                <div class="form-group">
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                        <label class="checkbox-row" for="{{ field.id_for_label }}">
+                            {{ field }} {{ field.label }}
+                        </label>
+                    {% else %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.name == 'password' %}
+                            <a href="{% url 'account_reset_password' %}" class="forgot-link">Esqueceu a senha?</a>
+                        {% endif %}
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="field-errors">
+                            {% for error in field.errors %}<span>{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <div class="helptext">{{ field.help_text }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="auth-btn-primary">
+                <i class="fa-solid fa-right-to-bracket"></i> Entrar
+            </button>
+        </form>
+    {% endif %}
+
+    {% if SOCIALACCOUNT_ENABLED %}
+        <div class="auth-divider">ou entre com</div>
+        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    {% endif %}
+{% endblock %}

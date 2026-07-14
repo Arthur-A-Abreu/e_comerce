@@ -1,0 +1,548 @@
+{% extends 'produtos/base.html' %}
+{% load socialaccount %}
+
+{% block title %}Meu Perfil | ArthurLivre{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* Profile Hero */
+    .profile-hero {
+        background: linear-gradient(135deg, var(--dark-navy) 0%, var(--light-navy) 100%);
+        border-radius: 16px;
+        padding: 36px;
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        margin-bottom: 28px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .profile-hero::before {
+        content: '';
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        background: rgba(0, 119, 182, 0.2);
+        border-radius: 50%;
+        top: -100px;
+        right: -60px;
+    }
+
+    .profile-hero::after {
+        content: '';
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        bottom: -50px;
+        left: 200px;
+    }
+
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.15);
+        border: 3px solid rgba(255,255,255,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-info {
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-greeting {
+        font-size: 13px;
+        opacity: 0.75;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .profile-name {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 6px;
+        letter-spacing: -0.3px;
+    }
+
+    .profile-email-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.12);
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+
+    /* Cards grid */
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .profile-card {
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .profile-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .profile-card.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .profile-card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .profile-card-header h2 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--dark-navy);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .profile-card-header .card-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    .profile-card-header a.card-action {
+        font-size: 13px;
+        color: var(--ocean-blue);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: var(--transition);
+    }
+
+    .profile-card-header a.card-action:hover {
+        text-decoration: underline;
+    }
+
+    .profile-card-body {
+        padding: 20px 22px;
+    }
+
+    /* Info rows */
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 14px;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-row i {
+        width: 20px;
+        text-align: center;
+        color: var(--ocean-blue);
+        font-size: 14px;
+    }
+
+    .info-row .info-label {
+        color: var(--text-light);
+        min-width: 90px;
+        font-size: 13px;
+    }
+
+    .info-row .info-value {
+        font-weight: 600;
+        color: var(--text-dark);
+        flex: 1;
+    }
+
+    .info-row .info-badge {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .badge-verified { background: var(--green-bg); color: var(--green-tag); }
+    .badge-pending { background: #fffbeb; color: #b7791f; }
+    .badge-active { background: rgba(0,119,182,0.1); color: var(--ocean-blue); }
+
+    /* Social connections */
+    .social-connection-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .social-connection-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .social-icon-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .social-icon-circle.google { background: #f8f8f8; border: 1px solid #e0e0e0; color: #ea4335; }
+    .social-icon-circle.facebook { background: #1877f2; color: white; }
+
+    .social-connection-info .social-name {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--dark-navy);
+    }
+
+    .social-connection-info .social-account {
+        font-size: 12px;
+        color: var(--text-light);
+        margin-top: 2px;
+    }
+
+    .connect-btn {
+        margin-left: auto;
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 2px solid var(--border-color);
+        background: var(--white);
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-family: var(--font-family);
+    }
+
+    .connect-btn.connected {
+        background: var(--green-bg);
+        border-color: var(--green-tag);
+        color: var(--green-tag);
+        cursor: default;
+    }
+
+    .connect-btn:not(.connected):hover {
+        border-color: var(--ocean-blue);
+        color: var(--ocean-blue);
+        transform: translateY(-1px);
+    }
+
+    /* Quick links */
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+    .quick-link-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 12px;
+        background: var(--bg-gray);
+        border-radius: 10px;
+        text-align: center;
+        transition: var(--transition);
+        text-decoration: none;
+        color: var(--text-dark);
+        border: 1px solid transparent;
+    }
+
+    .quick-link-item:hover {
+        background: rgba(0,119,182,0.06);
+        border-color: rgba(0,119,182,0.2);
+        color: var(--ocean-blue);
+        transform: translateY(-2px);
+    }
+
+    .quick-link-item .ql-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--dark-navy) 0%, var(--light-navy) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-size: 18px;
+    }
+
+    .quick-link-item:hover .ql-icon {
+        background: linear-gradient(135deg, var(--ocean-blue) 0%, var(--mid-navy) 100%);
+    }
+
+    .quick-link-item span {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .profile-hero {
+            flex-direction: column;
+            text-align: center;
+            padding: 28px 20px;
+        }
+        .profile-grid {
+            grid-template-columns: 1fr;
+        }
+        .profile-card.full-width {
+            grid-column: auto;
+        }
+        .quick-links {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+    <!-- Profile Hero -->
+    <div class="profile-hero">
+        <div class="profile-avatar">
+            {% get_social_accounts user as accounts %}
+            {% if accounts.google %}
+                {% with acc=accounts.google.0 %}
+                    {% if acc.extra_data.picture %}
+                        <img src="{{ acc.extra_data.picture }}" alt="Avatar">
+                    {% else %}
+                        <i class="fa-solid fa-user"></i>
+                    {% endif %}
+                {% endwith %}
+            {% else %}
+                <i class="fa-solid fa-user"></i>
+            {% endif %}
+        </div>
+        <div class="profile-info">
+            <p class="profile-greeting">Bem-vindo de volta,</p>
+            <h1 class="profile-name">
+                {{ user.get_full_name|default:user.username|default:"Usuário" }}
+            </h1>
+            <div class="profile-email-tag">
+                <i class="fa-solid fa-envelope" style="font-size:12px;"></i>
+                {{ user.email }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="profile-grid">
+
+        <!-- Informações da Conta -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h2>
+                    <div class="card-icon" style="background:rgba(0,119,182,0.1);color:var(--ocean-blue);">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    Informações da Conta
+                </h2>
+            </div>
+            <div class="profile-card-body">
+                <div class="info-row">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="info-label">Usuário</span>
+                    <span class="info-value">{{ user.username|default:"—" }}</span>
+                </div>
+                <div class="info-row">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ user.email|default:"—" }}</span>
+                </div>
+                <div class="info-row">
+                    <i class="fa-solid fa-calendar"></i>
+                    <span class="info-label">Membro desde</span>
+                    <span class="info-value">{{ user.date_joined|date:"d/m/Y" }}</span>
+                </div>
+                <div class="info-row">
+                    <i class="fa-solid fa-clock"></i>
+                    <span class="info-label">Último acesso</span>
+                    <span class="info-value">{{ user.last_login|date:"d/m/Y H:i"|default:"—" }}</span>
+                </div>
+                <div class="info-row">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span class="info-label">Status</span>
+                    <span class="info-badge badge-active">Ativo</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h2>
+                    <div class="card-icon" style="background:rgba(0,166,80,0.1);color:var(--green-tag);">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    Ações Rápidas
+                </h2>
+            </div>
+            <div class="profile-card-body">
+                <div class="quick-links">
+                    <a href="{% url 'account_email' %}" class="quick-link-item" id="ql-email">
+                        <div class="ql-icon"><i class="fa-solid fa-envelope"></i></div>
+                        <span>Gerenciar Emails</span>
+                    </a>
+                    <a href="{% url 'account_change_password' %}" class="quick-link-item" id="ql-password">
+                        <div class="ql-icon"><i class="fa-solid fa-key"></i></div>
+                        <span>Alterar Senha</span>
+                    </a>
+                    <a href="{% url 'socialaccount_connections' %}" class="quick-link-item" id="ql-social">
+                        <div class="ql-icon"><i class="fa-solid fa-link"></i></div>
+                        <span>Contas Sociais</span>
+                    </a>
+                    <a href="{% url 'produtos:index' %}" class="quick-link-item" id="ql-shop">
+                        <div class="ql-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+                        <span>Ver Produtos</span>
+                    </a>
+                    <a href="#" class="quick-link-item" id="ql-orders">
+                        <div class="ql-icon"><i class="fa-solid fa-box"></i></div>
+                        <span>Meus Pedidos</span>
+                    </a>
+                    <a href="{% url 'account_logout' %}" class="quick-link-item" id="ql-logout" style="color:var(--text-light);">
+                        <div class="ql-icon" style="background:linear-gradient(135deg,#c53030,#e53e3e);"><i class="fa-solid fa-right-from-bracket"></i></div>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contas Sociais Conectadas -->
+        <div class="profile-card full-width">
+            <div class="profile-card-header">
+                <h2>
+                    <div class="card-icon" style="background:rgba(24,119,242,0.1);color:#1877f2;">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </div>
+                    Contas Sociais
+                </h2>
+                <a href="{% url 'socialaccount_connections' %}" class="card-action">
+                    <i class="fa-solid fa-gear"></i> Gerenciar
+                </a>
+            </div>
+            <div class="profile-card-body">
+                {% get_social_accounts user as accounts %}
+
+                <!-- Google -->
+                <div class="social-connection-item">
+                    <div class="social-icon-circle google">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 48 48">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                    </div>
+                    <div class="social-connection-info">
+                        <div class="social-name">Google</div>
+                        <div class="social-account">
+                            {% if accounts.google %}
+                                {{ accounts.google.0.extra_data.email|default:"Conectado" }}
+                            {% else %}
+                                Não conectado
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if accounts.google %}
+                        <span class="connect-btn connected">
+                            <i class="fa-solid fa-check"></i> Conectado
+                        </span>
+                    {% else %}
+                        <a href="{% url 'socialaccount_connections' %}" class="connect-btn" id="connect-google">
+                            <i class="fa-solid fa-plus"></i> Conectar
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Facebook -->
+                <div class="social-connection-item">
+                    <div class="social-icon-circle facebook">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </div>
+                    <div class="social-connection-info">
+                        <div class="social-name">Facebook</div>
+                        <div class="social-account">
+                            {% if accounts.facebook %}
+                                {{ accounts.facebook.0.extra_data.name|default:"Conectado" }}
+                            {% else %}
+                                Não conectado
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if accounts.facebook %}
+                        <span class="connect-btn connected">
+                            <i class="fa-solid fa-check"></i> Conectado
+                        </span>
+                    {% else %}
+                        <a href="{% url 'socialaccount_connections' %}" class="connect-btn" id="connect-facebook">
+                            <i class="fa-solid fa-plus"></i> Conectar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

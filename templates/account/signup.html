@@ -1,0 +1,48 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n allauth %}
+
+{% block page_title %}Criar conta grátis{% endblock %}
+
+{% block auth_content %}
+    <p class="auth-link-text">
+        Já tem uma conta?
+        <a href="{{ login_url }}">Entrar agora</a>
+    </p>
+
+    {% if not SOCIALACCOUNT_ONLY %}
+        <form method="post" action="{% url 'account_signup' %}" class="auth-form" id="signup-form">
+            {% csrf_token %}
+            {{ redirect_field }}
+
+            {% for field in form %}
+                <div class="form-group">
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                        <label class="checkbox-row" for="{{ field.id_for_label }}">
+                            {{ field }} {{ field.label }}
+                        </label>
+                    {% else %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="field-errors">
+                            {% for error in field.errors %}<span>{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <div class="helptext">{{ field.help_text }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="auth-btn-primary">
+                <i class="fa-solid fa-user-plus"></i> Criar Conta
+            </button>
+        </form>
+    {% endif %}
+
+    {% if SOCIALACCOUNT_ENABLED %}
+        <div class="auth-divider">ou cadastre-se com</div>
+        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    {% endif %}
+{% endblock %}

@@ -252,6 +252,184 @@
                 text-align: center;
             }
         }
+
+        /* Nav Signup Badge */
+        .nav-signup {
+            background: var(--ocean-blue);
+            color: var(--white) !important;
+            padding: 7px 14px;
+            border-radius: 8px;
+            opacity: 1 !important;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .nav-signup:hover {
+            background: #005f8a;
+            color: var(--white) !important;
+            transform: translateY(-1px);
+        }
+
+        /* User Menu Dropdown */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: var(--white);
+            font-family: var(--font-family);
+            font-size: 14px;
+            font-weight: 500;
+            padding: 7px 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-menu-trigger:hover {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.35);
+        }
+
+        .user-avatar-sm {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--ocean-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .user-avatar-sm img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name-sm {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .user-chevron {
+            font-size: 11px;
+            transition: transform 0.3s ease;
+        }
+
+        .user-menu.open .user-chevron {
+            transform: rotate(180deg);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 240px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 12px 32px rgba(11,19,43,0.18);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            z-index: 999;
+        }
+
+        .user-menu.open .user-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-gray);
+        }
+
+        .dropdown-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--dark-navy) 0%, var(--light-navy) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 15px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .dropdown-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--dark-navy);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .dropdown-email {
+            font-size: 12px;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: var(--transition);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(0,119,182,0.06);
+            color: var(--ocean-blue);
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .dropdown-item-danger {
+            color: #c53030;
+        }
+
+        .dropdown-item-danger:hover {
+            background: #fff5f5;
+            color: #c53030;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -273,7 +451,54 @@
                 
                 <div class="header-right">
                     <a href="#" class="nav-link"><i class="fa-solid fa-shopping-cart"></i> Carrinho</a>
-                    <a href="#" class="nav-link"><i class="fa-solid fa-circle-user"></i> Entrar</a>
+
+                    {% if user.is_authenticated %}
+                        <!-- User dropdown -->
+                        <div class="user-menu" id="user-menu">
+                            <button class="user-menu-trigger" id="user-menu-trigger" aria-expanded="false">
+                                <div class="user-avatar-sm">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <span class="user-name-sm">{{ user.get_full_name|default:user.username|default:user.email|truncatechars:15 }}</span>
+                                <i class="fa-solid fa-chevron-down user-chevron"></i>
+                            </button>
+                            <div class="user-dropdown" id="user-dropdown">
+                                <div class="dropdown-header">
+                                    <div class="dropdown-avatar">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="dropdown-name">{{ user.get_full_name|default:user.username|default:"Usuário" }}</div>
+                                        <div class="dropdown-email">{{ user.email }}</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="{% url 'produtos:perfil' %}" class="dropdown-item">
+                                    <i class="fa-solid fa-id-card"></i> Meu Perfil
+                                </a>
+                                <a href="{% url 'account_email' %}" class="dropdown-item">
+                                    <i class="fa-solid fa-envelope"></i> Gerenciar Email
+                                </a>
+                                <a href="{% url 'account_change_password' %}" class="dropdown-item">
+                                    <i class="fa-solid fa-key"></i> Alterar Senha
+                                </a>
+                                <a href="{% url 'socialaccount_connections' %}" class="dropdown-item">
+                                    <i class="fa-solid fa-link"></i> Contas Sociais
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{% url 'account_logout' %}" class="dropdown-item dropdown-item-danger">
+                                    <i class="fa-solid fa-right-from-bracket"></i> Sair
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'account_login' %}" class="nav-link" id="nav-login">
+                            <i class="fa-solid fa-right-to-bracket"></i> Entrar
+                        </a>
+                        <a href="{% url 'account_signup' %}" class="nav-link nav-signup" id="nav-signup">
+                            <i class="fa-solid fa-user-plus"></i> Criar conta
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             
@@ -286,7 +511,7 @@
                     <a href="#" class="category-item">Suporte</a>
                 </div>
                 <div>
-                    <span><i class="fa-solid fa-location-dot"></i> Enviar para Arthur - São Paulo</span>
+                    <span><i class="fa-solid fa-location-dot"></i> Enviar para Arthur - Espirito Santo</span>
                 </div>
             </div>
         </div>
@@ -311,6 +536,36 @@
             </div>
         </div>
     </footer>
+    <script>
+        // User menu dropdown toggle
+        (function() {
+            const trigger = document.getElementById('user-menu-trigger');
+            const menu = document.getElementById('user-menu');
+            if (!trigger || !menu) return;
+
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = menu.classList.toggle('open');
+                trigger.setAttribute('aria-expanded', isOpen);
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', function(e) {
+                if (menu && !menu.contains(e.target)) {
+                    menu.classList.remove('open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    menu.classList.remove('open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+        })();
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>

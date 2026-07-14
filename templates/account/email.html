@@ -1,0 +1,95 @@
+{% extends "account/base_manage.html" %}
+{% load i18n allauth static %}
+
+{% block manage_content %}
+<div class="manage-card">
+    <div class="manage-card-header">
+        <h2><i class="fa-solid fa-envelope" style="color:var(--ocean-blue);margin-right:8px;"></i>Gerenciar Emails</h2>
+    </div>
+    <div class="manage-card-body">
+        {% if emailaddresses %}
+            <p style="font-size:14px;color:var(--text-light);margin-bottom:20px;">
+                Os seguintes endereços de email estão associados à sua conta:
+            </p>
+            <form method="post" action="{% url 'account_email' %}" class="manage-form" id="email-manage-form">
+                {% csrf_token %}
+                {% for radio in emailaddress_radios %}
+                    {% with emailaddress=radio.emailaddress %}
+                        <div class="email-item">
+                            <input type="radio"
+                                   name="email"
+                                   value="{{ emailaddress.email }}"
+                                   id="{{ radio.id }}"
+                                   {% if radio.checked %}checked{% endif %}
+                                   style="flex-shrink:0;">
+                            <label for="{{ radio.id }}" style="flex:1;cursor:pointer;font-size:15px;font-weight:500;color:var(--text-dark);">
+                                {{ emailaddress.email }}
+                            </label>
+                            <div class="email-badges">
+                                {% if emailaddress.primary %}
+                                    <span class="badge primary">Principal</span>
+                                {% endif %}
+                                {% if emailaddress.verified %}
+                                    <span class="badge verified"><i class="fa-solid fa-check" style="font-size:10px;"></i> Verificado</span>
+                                {% else %}
+                                    <span class="badge unverified"><i class="fa-solid fa-clock" style="font-size:10px;"></i> Pendente</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+
+                <div class="btn-actions" style="margin-top:20px;">
+                    <button type="submit" name="action_primary" class="btn-primary-manage">
+                        <i class="fa-solid fa-star"></i> Tornar Principal
+                    </button>
+                    <button type="submit" name="action_send" class="btn-secondary-manage">
+                        <i class="fa-solid fa-paper-plane"></i> Reenviar Verificação
+                    </button>
+                    <button type="submit" name="action_remove" class="btn-danger-manage"
+                            onclick="return confirm('Tem certeza que deseja remover este email?')">
+                        <i class="fa-solid fa-trash"></i> Remover
+                    </button>
+                </div>
+            </form>
+        {% else %}
+            <div style="text-align:center;padding:24px 0;color:var(--text-light);">
+                <i class="fa-solid fa-envelope-open" style="font-size:40px;margin-bottom:12px;display:block;opacity:0.4;"></i>
+                Nenhum email associado à sua conta ainda.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if can_add_email %}
+<div class="manage-card">
+    <div class="manage-card-header">
+        <h2><i class="fa-solid fa-plus" style="color:var(--green-tag);margin-right:8px;"></i>Adicionar Email</h2>
+    </div>
+    <div class="manage-card-body">
+        <form method="post" action="{% url 'account_email' %}" class="manage-form" id="add-email-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-errors">{% for e in field.errors %}{{ e }}{% endfor %}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" name="action_add" class="btn-primary-manage">
+                <i class="fa-solid fa-plus"></i> Adicionar Email
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{{ block.super }}
+<script src="{% static 'account/js/account.js' %}"></script>
+<script src="{% static 'account/js/onload.js' %}"></script>
+<script data-allauth-onload="allauth.account.forms.manageEmailForm" type="application/json">{
+"i18n": {"confirmDelete": "Tem certeza que deseja remover este email?"}
+}</script>
+{% endblock %}
